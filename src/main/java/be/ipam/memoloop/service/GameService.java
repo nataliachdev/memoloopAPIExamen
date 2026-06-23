@@ -63,7 +63,7 @@ public class GameService {
         return gameMapper.toDto(game);
     }
 
-    public GameAnswerDto getNextCard(Long id) {
+    /*public GameAnswerDto getNextCard(Long id) {
         Game game = gameRepository.findById(id).orElseThrow(() -> new RuntimeException("Game not found"));
         //find first not answered boolean null
         Optional<GameAnswer> firstUnanswered = game.getAnswers().stream()
@@ -71,6 +71,20 @@ public class GameService {
         return firstUnanswered
                 .map(gameAnswerMapper::toDto)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No more cards"));
+    }*/
+    public GameAnswerDto getNextCard(Long id) {
+        Game game = gameRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Game not found"));
+
+        Optional<GameAnswer> firstUnanswered = game.getAnswers().stream()
+                .filter(a -> a.getAnswer() == null)
+                .min(Comparator.comparing(GameAnswer::getId));
+
+        if (firstUnanswered.isEmpty()) {
+            return null; // FIN DU JEU
+        }
+
+        return gameAnswerMapper.toDto(firstUnanswered.get());
     }
 
     public GameAnswerDto answer(GameAnswerDto answerDto) {

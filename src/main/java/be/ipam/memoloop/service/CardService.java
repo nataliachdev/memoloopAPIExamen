@@ -55,4 +55,20 @@ public class CardService {
         }
         cardRepository.deleteById(id);
     }
+
+    public CardDto updateCard(Long id, CreateCardDto dto) {
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Card not found with id: " + id));
+
+        card.setWord(dto.getWord());
+        card.setTranslation(dto.getTranslation());
+
+        Card updatedCard = cardRepository.save(card);
+
+        return new CardDto(
+                updatedCard.getId(),
+                updatedCard.getWord(),
+                updatedCard.getTranslation()
+        );
+    }
 }
